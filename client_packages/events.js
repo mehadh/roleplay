@@ -32,6 +32,11 @@ mp.events.add('client:spectate', (target) => {
     else { mp.gui.chat.push(`${sP} You can not spectate that player!`) }
 })
 
+mp.events.add('client:clearSpectate', () => {
+    spectate = false
+    spectating = null
+})
+
 mp.events.add('render', () => {
     if (spectate && spectating != null && spectating.handle !== 0) {
         mp.game.invoke("0x8BBACBF51DA047A8", spectating.handle)

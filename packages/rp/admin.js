@@ -770,7 +770,8 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
-                player.specTimer = setInterval(specPos, 5000)
+                player.specTimer = setInterval(specPos(player, getId), 5000)
+                player.specOld = player.position
                 player.call('client:spectate', [getId.id])
             }
             else { player.outputChatBox(sNotFound) }
@@ -780,3 +781,19 @@ mp.events.addCommand('spec', (player, fullText, id) => {
     else { player.outputChatBox(sPerm) }
 })
 
+mp.events.addCommand('unspec', (player) => {
+    if (player.admin > 1) {
+        player.outputChatBox(`${aP} Clearing your spectate session.`)
+        player.call('client:clearSpectate')
+        clearInterval(player.specTimer)
+        if (player.specTarget) {
+            let getId = findPlayer(player.specTarget)
+            player.specTarget = undefined
+            if (getId) {
+                getId.specMaster = undefined
+            }
+        }
+        player.position = player.specOld
+    }
+    else { player.outputChatBox(sPerm) }
+})
