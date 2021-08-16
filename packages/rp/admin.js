@@ -771,9 +771,9 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
-                player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
+                player.specTimer = setInterval(specPos(player, getId), 5000)
                 player.specOld = player.position
-                player.call('client:spectate', [getId.id])
+                setTimeout(function () { player.call('client:spectate', [getId.id]) }, 500)
             }
             else { player.outputChatBox(sNotFound) }
         }
