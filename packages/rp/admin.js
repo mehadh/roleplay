@@ -771,6 +771,8 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
+                clearInterval(player.specTimer)
+                player.specTimer = undefined
                 player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
                 player.specOld = player.position
                 let streamCheck = setInterval(() => {
@@ -791,7 +793,7 @@ mp.events.addCommand('spec', (player, fullText, id) => {
     else { player.outputChatBox(sPerm) }
 })
 
-mp.events.addCommand('unspec', (player) => {
+mp.events.add('server:unspec', (player) => {
     if (player.admin > 1) {
         player.outputChatBox(`${aP} Clearing your spectate session.`)
         player.call('client:clearSpectate')
@@ -810,4 +812,8 @@ mp.events.addCommand('unspec', (player) => {
         player.alpha = 255;
     }
     else { player.outputChatBox(sPerm) }
+})
+
+mp.events.addCommand('unspec', (player) => {
+    mp.events.call('server:unspec', player)
 })

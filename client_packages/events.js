@@ -29,7 +29,10 @@ mp.events.add('client:spectate', (target) => {
         spectate = true
         spectating = getId
     }
-    else { mp.gui.chat.push(`${sP} You can not spectate that player!`) }
+    else {
+        mp.gui.chat.push(`${sP} You can not spectate that player!`)
+        mp.events.callRemote('server:unspec')
+    }
 })
 
 mp.events.add('client:clearSpectate', () => {
@@ -45,5 +48,6 @@ mp.events.add('render', () => {
         spectate = false
         spectating = null
         mp.gui.chat.push(`${sP} The spectated player is no longer valid.`)
+        mp.events.callRemote('server:unspec')
     }
 })
