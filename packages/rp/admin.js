@@ -731,3 +731,40 @@ mp.events.addCommand("freecam", (player) => {
     }
     else { player.outputChatBox(sPerm) }
 })
+
+mp.events.addCommand('veh', (player, fullText, arg1, arg2, arg3, arg4) => {
+    if (player.admin > 1) {
+        if (arg1) {
+            adminVeh = mp.vehicles.new(arg1, player.position,
+                {
+                    color: [[parseInt(arg2), parseInt(arg3), parseInt(arg4)], [parseInt(arg2), parseInt(arg3), parseInt(arg4)]],
+                    numberPlate: "ADMIN"
+                });
+            adminVeh.timer = setInterval(function () {
+                let occupants = adminVeh.getOccupants()
+                if (occupants.length == 0) {
+                    clearInterval(adminVeh.timer)
+                    adminVeh.destroy();
+                }
+            }, 300000)
+        }
+        else { player.outputChatBox(`${uP} /veh [model] [color] [color] [color]`) }
+
+    }
+    else { player.outputChatBox(sPerm) }
+});
+
+mp.events.addCommand('spec', (player, fullText, id) => {
+    if (player.admin > 1) {
+        if (id) {
+            let getId = findPlayer(id)
+            if (getId) {
+                player.outputChatBox(`${aP} You are now spectating ${getId.name}!`)
+                player.call('client:spectate', [getId.id])
+            }
+            else { player.outputChatBox(sNotFound) }
+        }
+        else { player.outputChatBox(`${uP} /spec [id]`) }
+    }
+    else { player.outputChatBox(sPerm) }
+})
