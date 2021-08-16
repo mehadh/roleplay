@@ -771,7 +771,7 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
-                player.specTimer = setInterval(specPos(player, getId), 5000)
+                player.specTimer = setInterval(function () { specPos(player, getId) }, 5000)
                 player.specOld = player.position
                 setTimeout(function () { player.call('client:spectate', [getId.id]) }, 500)
             }
