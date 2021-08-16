@@ -25,7 +25,7 @@ mp.events.add('client:spectate', (target) => {
 
 mp.events.add('render', () => {
     if (spectate && spectating != null && spectating.handle !== 0) {
-        mp.game.invoke("0x8BBACBF51DA047A8", target.handle)
+        mp.game.invoke("0x8BBACBF51DA047A8", spectating.handle)
     }
     else if (spectate) {
         spectate = false
