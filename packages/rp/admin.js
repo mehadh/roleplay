@@ -766,14 +766,23 @@ mp.events.addCommand('spec', (player, fullText, id) => {
             let getId = findPlayer(id)
             if (getId) {
                 player.alpha = 0;
-                player.outputChatBox(`${aP} You are now spectating ${getId.name}!`)
+                player.outputChatBox(`${aP} Starting spectate on ${getId.name}!`)
                 player.specTarget = getId.id
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
                 player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
                 player.specOld = player.position
-
+                let streamCheck = setInterval(() => {
+                    if (player.isStreamed(getId)) {
+                        player.outputChatBox(`${aP} Target in stream distance!`)
+                        player.call('client:spectate', [getId.id])
+                        clearInterval(streamCheck)
+                    }
+                    else {
+                        player.outputChatBox(`${aP} Streaming...`)
+                    }
+                }, 250)
             }
             else { player.outputChatBox(sNotFound) }
         }
