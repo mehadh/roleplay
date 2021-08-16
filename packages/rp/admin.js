@@ -771,9 +771,9 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
-                player.specTimer = setInterval(function () { specPos(player, getId) }, 5000)
+                player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
                 player.specOld = player.position
-                setTimeout(function () { player.call('client:spectate', [getId.id]) }, 500)
+
             }
             else { player.outputChatBox(sNotFound) }
         }
@@ -787,6 +787,7 @@ mp.events.addCommand('unspec', (player) => {
         player.outputChatBox(`${aP} Clearing your spectate session.`)
         player.call('client:clearSpectate')
         clearInterval(player.specTimer)
+        player.specTimer = undefined
         if (player.specTarget) {
             let getId = findPlayer(player.specTarget)
             player.specTarget = undefined
