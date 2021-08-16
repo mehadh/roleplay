@@ -765,12 +765,13 @@ mp.events.addCommand('spec', (player, fullText, id) => {
         if (id) {
             let getId = findPlayer(id)
             if (getId) {
+                player.alpha = 0;
                 player.outputChatBox(`${aP} You are now spectating ${getId.name}!`)
                 player.specTarget = getId.id
                 getId.specMaster = player.id
                 player.call('client:freeze')
                 specPos(player, getId)
-                player.specTimer = setInterval(specPos(player, getId), 5000)
+                player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
                 player.specOld = player.position
                 player.call('client:spectate', [getId.id])
             }
@@ -793,7 +794,10 @@ mp.events.addCommand('unspec', (player) => {
                 getId.specMaster = undefined
             }
         }
-        player.position = player.specOld
+        //player.position = player.specOld
+        player.spawn(new mp.Vector3(-949.4786, -1484.449, 1.014465));
+        player.call('client:unfreeze')
+        player.alpha = 255;
     }
     else { player.outputChatBox(sPerm) }
 })
