@@ -258,14 +258,14 @@ mp.events.addCommand("accid", async (player, fullText, type, arg, arg2 = null) =
         if (type == "acc" && arg || type == "char" && arg && arg2) {
             if (type == "acc") {
                 [row] = await mp.db.query('SELECT * FROM `accounts` WHERE `username` = ?', [arg])
-                if (row.length > 0) { player.outputChatBox(`${aP} Username: ${arg} Account ID: ${row[0].ID} Registered: ${row[0].registerDate.toISOString().split('T')[0]} Last Active: ${row[0].lastActive.toISOString().split('T')[0]}`) }
+                if (row.length > 0) { player.outputChatBox(`${aP} Account ID: ${row[0].ID} Registered: ${row[0].registerDate.toISOString().split('T')[0]} Last Active: ${row[0].lastActive.toISOString().split('T')[0]}`) }
                 else { player.outputChatBox(`${aP} There was no account found based on this query.`) }
             }
             else if (type == "char") {
                 [row2] = await mp.db.query('SELECT * FROM `characters` WHERE `first` = ? AND `last` = ?', [arg, arg2])
                 if (row2.length > 0) {
                     [row] = await mp.db.query('SELECT * FROM `accounts` WHERE `ID` = ?', [row2[0].accId])
-                    if (row.length > 0) { player.outputChatBox(`${aP} Username: ${arg} Account ID: ${row[0].ID} Registered: ${row[0].registerDate.toISOString().split('T')[0]} Last Active: ${row[0].lastActive.toISOString().split('T')[0]}`) }
+                    if (row.length > 0) { player.outputChatBox(`${aP} Account ID: ${row[0].ID} Registered: ${row[0].registerDate.toISOString().split('T')[0]} Last Active: ${row[0].lastActive.toISOString().split('T')[0]}`) }
                     else { player.outputChatBox(`${aP} There was no account found based on this query.`) }
                 }
                 else { player.outputChatBox(`${aP} There was no account found based on this query.`) }
@@ -754,12 +754,23 @@ mp.events.addCommand('veh', (player, fullText, arg1, arg2, arg3, arg4) => {
     else { player.outputChatBox(sPerm) }
 });
 
+function specPos(player, getId) {
+    let pos = getId.position
+    pos.z += 50
+    player.position = pos
+}
+
 mp.events.addCommand('spec', (player, fullText, id) => {
     if (player.admin > 1) {
         if (id) {
             let getId = findPlayer(id)
             if (getId) {
                 player.outputChatBox(`${aP} You are now spectating ${getId.name}!`)
+                player.specTarget = getId.id
+                getId.specMaster = player.id
+                player.call('client:freeze')
+                specPos(player, getId)
+                player.specTimer = setInterval(specPos, 5000)
                 player.call('client:spectate', [getId.id])
             }
             else { player.outputChatBox(sNotFound) }
@@ -768,3 +779,4 @@ mp.events.addCommand('spec', (player, fullText, id) => {
     }
     else { player.outputChatBox(sPerm) }
 })
+

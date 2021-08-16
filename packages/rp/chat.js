@@ -3,7 +3,7 @@ mp.events.add('playerChat', (player, message) => {
 })
 
 mp.events.addCommand("pm", (player, fullText, id, ...message) => {
-    if (id == null || id == undefined || message == null || message == undefined) { player.outputChatBox(`${uP} /pm [id] [message]`) }
+    if (id == null || id == undefined || message == null || message == undefined || message.length < 1) { player.outputChatBox(`${uP} /pm [id] [message]`) }
     else {
         message = message.join(' ');
         let getId = findPlayer(id)
@@ -11,7 +11,7 @@ mp.events.addCommand("pm", (player, fullText, id, ...message) => {
             if (player.cName == null || player.aDuty == true) { sender = player.aName }
             else { sender = player.cName }
             if (getId.cName == null || getId.aDuty == true) { receiver = getId.aName }
-            else { receiver = player.cName }
+            else { receiver = getId.cName }
             if (player.aDuty == true) { sender = `${cAdm}${sender}${cPm}` }
             if (getId.aDuty == true) { receiver = `${cAdm}${receiver}${cPm}` }
             player.outputChatBox(`${cPm}(( PM to ${receiver} (${getId.id}): ${message} ))`)

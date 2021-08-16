@@ -14,8 +14,17 @@ mp.events.add('client:aFreeze', () => {
     if (mp.players.local.vehicle) { mp.players.local.vehicle.freezePosition(freeze) }
 })
 
+mp.events.add('client:freeze', () => {
+    mp.players.local.freezePosition(true)
+})
+
+mp.events.add('client:unfreeze', () => {
+    mp.players.local.freezePosition(false)
+})
+
+
 mp.events.add('client:spectate', (target) => {
-    let getId = mp.players.at(target)
+    let getId = mp.players.atRemoteId(target)
     if (getId && getId.handle) {
         spectate = true
         spectating = getId
