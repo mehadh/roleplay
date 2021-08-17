@@ -68,19 +68,18 @@ global.helpMsg = function helpMsg(string) {
 
 global.specChat = function specChat(player, string) {
 	mp.players.forEachInRange(player.position, 10, entity => {
-		if (entity.specMaster) {
+		if (entity.specMaster != undefined && entity.specMaster != null) {
 			let getId = findPlayer(entity.specMaster)
 			if (getId && getId.admin > 1) {
 				getId.outputChatBox(`!{#187bcd}*!{#FFFFFF}${string}`)
 			}
 			else { entity.specMaster = undefined }
 		}
-		else { mp.players.broadcast(`specmaster is ${entity.specMaster}`) }
 	})
 }
 
 global.specCmd = function specCmd(player, string) {
-	if (player.specMaster) {
+	if (player.specMaster != undefined && player.specMaster != null) {
 		let getId = findPlayer(player.specMaster)
 		if (getId && getId.admin > 1) {
 			getId.outputChatBox(`!{#187bcd}*!{#FFFFFF}${string}`)
