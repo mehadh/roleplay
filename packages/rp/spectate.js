@@ -4,7 +4,7 @@ function specPos(player, getId) {
     player.position = pos
 }
 
-mp.events.addCommand('spec', (player, fullText, id) => {
+mp.events.add('spec', (player, id) => {
     if (player.admin > 1) {
         if (player.specTarget) {
             let getId = findPlayer(player.specTarget)
@@ -24,7 +24,7 @@ mp.events.addCommand('spec', (player, fullText, id) => {
                 specPos(player, getId)
                 clearInterval(player.specTimer)
                 player.specTimer = undefined
-                player.specTimer = setInterval(() => { specPos(player, getId) }, 5000)
+                player.specTimer = setInterval(() => { specPos(player, getId) }, 2500)
                 player.specOld = player.position
                 let streamCheck = setInterval(() => {
                     if (player.isStreamed(getId)) {
@@ -42,6 +42,10 @@ mp.events.addCommand('spec', (player, fullText, id) => {
         else { player.outputChatBox(`${uP} /spec [id]`) }
     }
     else { player.outputChatBox(sPerm) }
+})
+
+mp.events.addCommand('spec', (player, fullText, id) => {
+    mp.events.call('server:spec', player, id)
 })
 
 mp.events.add('server:unspec', (player) => {
@@ -181,3 +185,5 @@ mp.events.addCommand("pm", (player, fullText, id, ...message) => {
     }
 
 })
+
+// pay located in money.js

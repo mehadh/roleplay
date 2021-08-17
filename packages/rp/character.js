@@ -30,6 +30,7 @@ mp.events.add('server:loadCharacter', async (player, charId) => {
         player.lName = rows[0].last
         player.cName = name
         player.charId = charId
+        mp.events.call('server:loadMoney', player, true)
         mp.events.call('server:spawnMenu', player, charId)
         //player.call('client:hideLoginScreen') // This should only happen when loadCharacter has completed.
 
@@ -85,6 +86,7 @@ mp.events.add('server:spawnMenu', async (player, charId) => {
     try {
         const [rows] = await mp.db.query('SELECT `position` FROM `characters` WHERE `accId` = ? AND `charId` = ?', [player.accId, charId])
         spawnList = [] // If this starts to get out of order, we can use a priority key that is hardcoded.
+        spawnList.push({ name: "Vespucci Docks", position: new mp.Vector3(-949.4786, -1484.449, 1.014465) })
         spawnList.push({ name: "Los Santos International Airport", position: new mp.Vector3(mp.settings.defaultSpawnPosition) })
         if (rows[0].position != null) {
             player.lastPos = rows[0].position
@@ -100,13 +102,25 @@ mp.events.add('server:spawnMenu', async (player, charId) => {
 })
 
 mp.events.addCommand('changechar', (player) => {
+    if (player.charId != undefined && player.charId != null) { mp.events.call("server:saveCharPos", player, player.position) }
     // We likely want to unload the character as well.
     pNamer(player)
     mp.players.broadcastInRange(player.position, dN, `${sP} ${pName} has changed characters.`)
     player.call('client:enableCharScreen')
     mp.events.call('server:characterMenu', player);
+    player.spawn(new mp.Vector3(-1411.260498046875, -687.9657592773438, 125.98267364501953));
 })
 
 mp.events.add('server:afterCharPos', (player) => {
     //player.outputChatBox('server:afterCharPos')
+})
+
+mp.events.add('server:saveCharPos', async (player, position) => {
+    try {
+        const [status] = await mp.db.query('UPDATE `characters` SET `position` = ? WHERE charId = ?', [JSON.stringify(position), player.charId]);
+    } catch (e) { errorHandler(e) }
+})
+
+mp.events.add('playerQuit', async (player) => {
+    if (player.charId != undefined && player.charId != null) { mp.events.call("server:saveCharPos", player, player.position) }
 })

@@ -47,6 +47,8 @@ mp.events.add('client:characterMenu', (characters) => {
 
 mp.events.add('client:createCharacter', () => {
     charBrowser = mp.browsers.new('package://cef/login/character.html');
+    mp.gui.chat.activate(false);
+    mp.gui.chat.show(false);
     setTimeout(() => { mp.gui.cursor.show(true, true); }, 500);
 })
 
@@ -55,6 +57,8 @@ mp.events.add('client:characterHandler', (handle) => {
         case 'success':
         case 'close':
             charBrowser.destroy();
+            mp.gui.chat.activate(true);
+            mp.gui.chat.show(true);
             mp.events.callRemote('server:characterMenu')
             // Here we should do something about what comes after creating a character. 
             break;

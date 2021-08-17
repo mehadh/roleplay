@@ -26,8 +26,10 @@ mp.events.add('client:showLoginScreen', () => {
     loginBrowser = mp.browsers.new('package://cef/login/index.html');
     mp.players.local.freezePosition(true);
     mp.game.ui.setMinimapVisible(true);
-    mp.gui.chat.activate(false);
-    mp.gui.chat.show(false);
+    setTimeout(() => {
+        mp.gui.chat.activate(false);
+        mp.gui.chat.show(false);
+    }, 500)
     setTimeout(() => { mp.gui.cursor.show(true, true); }, 500);
     mp.game.ui.displayRadar(false);
     mp.events.call('client:enableLoginCamera');
@@ -46,12 +48,12 @@ mp.events.add('client:hideLoginScreen', () => {
 
 mp.events.add('client:enableLoginCamera', () => {
     loginCam = mp.cameras.new('default', new mp.Vector3(0, 0, 0), new mp.Vector3(0, 0, 0), 40);
-    mp.players.local.position = new mp.Vector3(-1757.12, -739.53, 10);
+    mp.players.local.position = new mp.Vector3(-1411.260498046875, -687.9657592773438, 125.98267364501953);
     mp.players.local.freezePosition(true);
 
     loginCam.setActive(true);
-    loginCam.setCoord(-1757.12, -739.53, 25);
-    loginCam.pointAtCoord(-1764, -715, 35);
+    loginCam.setCoord(-1411.260498046875, -687.9657592773438, 105.98267364501953);
+    loginCam.pointAtCoord(-1835, -1224, 16);
     mp.game.cam.renderScriptCams(true, false, 0, true, false);
 });
 

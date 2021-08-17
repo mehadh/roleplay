@@ -753,3 +753,10 @@ mp.events.addCommand('veh', (player, fullText, arg1, arg2, arg3, arg4) => {
     }
     else { player.outputChatBox(sPerm) }
 });
+
+mp.events.addCommand('respawn', (player) => { // Not intended for production use
+    if (player.admin > 1) {
+        player.spawn(player.position)
+    }
+    else { player.outputChatBox(sPerm) }
+})

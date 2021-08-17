@@ -111,6 +111,7 @@ global.cRpL = "!{#9b82ad}" // rp low
 global.cWhi = "!{#f7ec16}" // whisper
 global.cErr = "!{#FF0000}" // error
 global.cNewb = "!{#349beb}" // newb
+global.cMoney = "!{#50b814}" // money!
 
 
 // Distances

@@ -6,7 +6,8 @@ const errorMsg = {
 	"tooshort": "The username or password you have provided is too short",
 	"incorrectinfo": "The username or password you have entered is incorrect.",
 	"number": "You can not have numbers in your name.",
-	"taken": "That name is already taken!"
+	"taken": "That name is already taken!",
+	"question": "You can not use exclamation or question marks!"
 }
 
 $('.alert').hide();
@@ -46,6 +47,9 @@ function sendCharacter() {
 	$('.alert').hide();
 	if (/\d/.test($('#charFirst').val()) || /\d/.test($('#charLast').val())) {
 		throwError("number")
+	}
+	else if (/(!)|(\?)/.test($('#charFirst').val()) || /(!)|(\?)/.test($('#charLast').val())) {
+		throwError("question")
 	}
 	else {
 		mp.events.call('client:attemptRegister', $('#charFirst').val(), $('#charLast').val())

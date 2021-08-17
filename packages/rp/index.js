@@ -9,3 +9,4 @@ require('./chat.js'); // Chat commands.
 require('./character.js');
 require('./admin.js');
 require('./spectate.js');
+require('./money.js')
