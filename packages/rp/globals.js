@@ -67,21 +67,15 @@ global.helpMsg = function helpMsg(string) {
 }
 
 global.specChat = function specChat(player, string) {
-	mp.players.broadcast(`${player.name} said ${string}`)
 	mp.players.forEachInRange(player.position, 10, entity => {
 		if (entity.specMaster) {
-			mp.players.broadcast('passed specmaster')
 			let getId = findPlayer(entity.specMaster)
 			if (getId && getId.admin > 1) {
-				mp.players.broadcast('passed getId')
 				getId.outputChatBox(`!{#187bcd}*!{#FFFFFF}${string}`)
 			}
-			else {
-				entity.specMaster = undefined
-				mp.players.broadcast('failed getId')
-			}
+			else { entity.specMaster = undefined }
 		}
-		else { mp.players.broadcast('failed specmaster') }
+		else { mp.players.broadcast(`specmaster is ${entity.specMaster}`) }
 	})
 }
 
