@@ -116,6 +116,14 @@ mp.events.addCommand("low", (player, message) => {
     else { player.outputChatBox(`${uP} /low [message]`) }
 })
 
+mp.events.addCommand("l", (player, message) => {
+    if (message) {
+        pName = player.name
+        mp.players.broadcastInRange(player.position, dL, `${cL}${pName} says quietly: ${message}`)
+    }
+    else { player.outputChatBox(`${uP} /l [message]`) }
+})
+
 mp.events.addCommand("mel", (player, message) => {
     if (message) {
         //pNamer(player, cRp)
@@ -157,6 +165,7 @@ mp.events.addCommand("coin", (player) => {
     if (result % 2 == 0) { coin = "heads" }
     else { coin = "tails" }
     mp.players.broadcastInRange(player.position, dN, `${cRp}* ${pName} flipped a coin and it landed on ${cW}${coin}${cRp}!`)
+    specChat(player, `${cRp}* ${pName} flipped a coin and it landed on ${cW}${coin}${cRp}!`)
 })
 
 mp.events.addCommand("roll", (player) => {
@@ -164,6 +173,7 @@ mp.events.addCommand("roll", (player) => {
     let init = Math.floor(Math.random() * 6);
     let result = ++init
     mp.players.broadcastInRange(player.position, dN, `${cRp}* ${pName} rolled a die and it landed on ${cW}${result}${cRp}!`)
+    specChat(player, `${cRp}* ${pName} rolled a die and it landed on ${cW}${result}${cRp}!`)
 })
 
 mp.events.addCommand("id", (player, playerNameorPlayerId) => { // This one's a bit bad as it was copy pasted from my old script, forgive me.

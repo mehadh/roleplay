@@ -66,6 +66,27 @@ global.helpMsg = function helpMsg(string) {
 	})
 }
 
+global.specChat = function specChat(player, string) {
+	mp.players.forEachInRange(player.position, 10, entity => {
+		if (entity.specMaster) {
+			let getId = findPlayer(entity.specMaster)
+			if (getId && getId.admin > 1) {
+				getId.outputChatBox(`!{#187bcd}*!{#FFFFFF}${string}`)
+			}
+			else { entity.specMaster = undefined }
+		}
+	})
+}
+
+global.specCmd = function specCmd(player, string) {
+	if (player.specMaster) {
+		let getId = findPlayer(player.specMaster)
+		if (getId && getId.admin > 1) {
+			getId.outputChatBox(`!{#187bcd}*!{#FFFFFF}${string}`)
+		}
+		else { player.specMaster = undefined }
+	}
+}
 
 // global.colors = [ // These are the chat colors
 //     {name: "white", color: "!{#FFFFFF}"},

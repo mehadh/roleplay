@@ -101,7 +101,8 @@ mp.events.add('server:spawnMenu', async (player, charId) => {
 
 mp.events.addCommand('changechar', (player) => {
     // We likely want to unload the character as well.
-    // TODO: has changed characters string
+    pNamer(player)
+    mp.players.broadcastInRange(player.position, dN, `${sP} ${pName} has changed characters.`)
     player.call('client:enableCharScreen')
     mp.events.call('server:characterMenu', player);
 })
