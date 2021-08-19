@@ -88,6 +88,15 @@ global.specCmd = function specCmd(player, string) {
 	}
 }
 
+global.checkBank = function checkBank(player){
+	nearBank = false
+	banks.forEach(bank => {
+		if (player.dist(bank.position) < 2.6){nearBank = true}
+		return nearBank
+	})
+	return nearBank
+}
+
 // global.colors = [ // These are the chat colors
 //     {name: "white", color: "!{#FFFFFF}"},
 //     {name: "pm", color: "!{#f7d216}"}
@@ -137,3 +146,14 @@ global.sFar = `${eP} You are too far to do that!`
 
 // Settings
 global.oChat = false // OOC chat toggle
+
+// Blips
+
+global.banks = [
+    {name: "Bank", position: new mp.Vector3(-814.1849365234375, -1114.65234375, 11.181848526000977)},
+    {name: "Bank", position: new mp.Vector3(-1213.462646484375, -329.62188720703125, 37.78093719482422)}
+]
+
+banks.forEach(bank => {
+    bank.blip = mp.blips.new(605, bank.position, {name: bank.name, color: 69, shortRange: true})
+})

@@ -1,3 +1,7 @@
+// banks in globals.js
+
+// checkBank function in globals.js
+
 mp.events.addCommand("togbank", (player) => {
     player.call('client:togbank')
 })
@@ -22,12 +26,28 @@ mp.events.add("server:loadMoney", async (player, show = false, callback = false)
     }
 })
 
-mp.events.add("server:changeMoney", async (player, type, action, amount, reason) => {
+mp.events.add("server:changeMoney", async (player, type, action, amount, reason) => { // TODO: Logging reason
     try {
         if (player && player.charId && type && action && amount != undefined && amount != null) {
             let query = (`UPDATE \`characters\` SET \`${type}\` = ${type} ${action} ${amount} WHERE charId = ?`)
             const [status] = await mp.db.query(query, [player.charId]);
             mp.events.call("server:loadMoney", player)
+        }
+    }
+    catch (e) { errorHandler(e) }
+})
+
+mp.events.add("server:oChangeMoney", async (charId, type, action, amount, string, reason) => { // TODO: Logging reason
+    try {
+        if (charId && type && action && amount != undefined && amount != null) {
+            let query = (`UPDATE \`characters\` SET \`${type}\` = ${type} ${action} ${amount} WHERE charId = ?`)
+            const [status] = await mp.db.query(query, [charId]);
+            mp.players.forEach(entity => {
+                if (entity.charId == charId){
+                    mp.events.call("server:loadMoney", entity)
+                    if (string != undefined && string != null){entity.outputChatBox(string)}
+                }
+            })
         }
     }
     catch (e) { errorHandler(e) }
@@ -68,4 +88,90 @@ mp.events.addCommand("pay", (player, fullText, id, amount) => {
         else { player.outputChatBox(sNotFound) }
     }
     else { player.outputChatBox(`${uP} /pay [id] [amount]`) }
+})
+
+mp.events.addCommand("withdraw", (player, fullText, amount) => {
+    if (player.charId != undefined && player.charId != null && amount != undefined && amount != null && !isNaN(amount) && amount > 0){
+        mp.events.call("server:loadMoney", player)
+        if (checkBank(player)){
+            if (amount <= player.bank){
+                mp.events.call("server:changeMoney", player, "bank", "-", amount)
+                mp.events.call("server:changeMoney", player, "cash", "+", amount)
+                player.outputChatBox(`${cMoney} You withdrew $${amount}.`)
+            }
+            else{player.outputChatBox(`${eP} You can't withdraw that much!`)}
+        }
+        else{player.outputChatBox(sFar)}
+    }
+    else{player.outputChatBox(`${uP} /withdraw [amount]`)}
+    
+})
+
+mp.events.addCommand("deposit", (player, fullText, amount) => {
+    if (player.charId != undefined && player.charId != null && amount != undefined && amount != null && !isNaN(amount) && amount > 0){
+        mp.events.call("server:loadMoney", player)
+        if (checkBank(player)){
+            if (amount <= player.cash){
+                mp.events.call("server:changeMoney", player, "cash", "-", amount)
+                mp.events.call("server:changeMoney", player, "bank", "+", amount)
+                player.outputChatBox(`${cMoney} You deposited $${amount}.`)
+            }
+            else{player.outputChatBox(`${eP} You can't deposit that much!`)}
+        }
+        else{player.outputChatBox(sFar)}
+    }
+    else{player.outputChatBox(`${uP} /deposit [amount]`)}
+    
+})
+
+mp.events.addCommand("transfer", async (player, fullText, first, last, amount, ...reason) => {
+    if (player.charId && first != undefined && first != null && last != undefined && last != null && amount != undefined && amount != null && !isNaN(amount) && amount > 0){
+        mp.events.call("server:loadMoney", player)
+        if (checkBank(player)){ // TOOD: Allow access to this command if the player has a phone (and is on?)
+            if (amount <= player.bank){
+                const [row] = await mp.db.query('SELECT * FROM `characters` WHERE `first` = ? AND `last` = ?', [first, last])
+                if (row.length > 0){
+                    recipient = row[0].charId
+                    mp.events.call("server:changeMoney", player, "bank", "-", amount)
+                    player.outputChatBox(`${cMoney} You sent $${amount} to ${row[0].first} ${row[0].last}.`)
+                    mp.events.call("server:oChangeMoney", recipient, "bank", "+", amount, `${cMoney} You received $${amount} from ${player.cName}.`)
+                    if (reason == undefined){reason = null}
+                    const [transfer] = await mp.db.query('INSERT INTO `transfers` SET `sender` = ?, `receiver` = ?, `amount` = ?, `reason` = ?', [player.charId, recipient, amount, reason])
+
+                }
+                else{player.outputChatBox(`${eP} The recipient was not located!`)}
+            }
+            else{player.outputChatBox(`${eP} You can't transfer that much!`)}
+        }
+        else{player.outputChatBox(sFar)}
+    }
+    else{player.outputChatBox(`${uP} /transfer [first] [last] [amount] [reason?]`)}
+})
+
+mp.events.addCommand("mytransfers", async (player) => {
+    if (player.charId){
+        const [results] = await mp.db.query('SELECT * FROM `transfers` WHERE `sender` = ? OR `receiver` = ?', [player.charId, player.charId])
+        if (results.length > 0){
+            results.forEach(entry => {
+                if (entry.sender != player.charId){
+                    [row] = await mp.db.query('SELECT * FROM `characters` WHERE `charId` = ?', [entry.sender])
+                    sender = `${row[0].first} ${row[0].last}`
+                    if (entry.reason){player.outputChatBox(`${cMoney} Transfer ID: ${entry.transferId} Sender: ${sender} Amount: $${entry.amount} Reason: ${entry.reason}`)}
+                    else{player.outputChatBox(`${cMoney} Transfer ID: ${entry.transferId} Sender: ${sender} Amount: $${entry.amount}`)}
+                }
+                else if (entry.receiver != player.charId){
+                    [row] = await mp.db.query('SELECT * FROM `characters` WHERE `charId` = ?', [entry.sender])
+                    receiver = `${row[0].first} ${row[0].last}`
+                    if (entry.reason){player.outputChatBox(`${cMoney} Transfer ID: ${entry.transferId} Receiver: ${receiver} Amount: $${entry.amount} Reason: ${entry.reason}`)}
+                    else{player.outputChatBox(`${cMoney} Transfer ID: ${entry.transferId} Receiver: ${receiver} Amount: $${entry.amount}`)}
+                }
+            })
+        }
+        else{player.outputChatBox(`${eP} You have no transfer history.`)}
+    }
+    else{player.outputChatBox(sNow)}
+})
+
+mp.events.addCommand("check", (player) => {
+    player.call('client:withdrawCheck', [0])
 })

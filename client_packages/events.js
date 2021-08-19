@@ -115,3 +115,17 @@ mp.events.add('render', () => {
         });
     }
 })
+
+atms = [-870868698, -1126237515, 506770882, -1364697528]
+
+mp.events.add('client:withdrawCheck', (amount) => {
+    check = 0
+    atms.some(type => {
+        check = mp.game.object.getClosestObjectOfType(pos.x, pos.y, pos.z, 3, type, false, false, false)
+        return check != 0
+    })
+    if (check != 0){
+        mp.gui.chat.push("Near ATM")
+    }
+    else{mp.gui.chat.push("Not near ATM.")}
+})
