@@ -24,7 +24,7 @@ mp.events.add('server:spec', (player, id) => {
                 specPos(player, getId)
                 clearInterval(player.specTimer)
                 player.specTimer = undefined
-                player.specTimer = setInterval(() => { specPos(player, getId) }, 2500)
+                player.specTimer = setInterval(() => { specPos(player, getId) }, 1000)
                 player.specOld = player.position
                 let streamCheck = setInterval(() => {
                     if (player.isStreamed(getId)) {
