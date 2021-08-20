@@ -222,7 +222,7 @@ mp.events.add('playerQuit', async (player) => {
 })
 
 mp.events.addCommand("payday", async (player) => {
-    if (checkBank()) {
+    if (checkBank(player)) {
         let amount = player.paycheck
         if (amount > 0) {
             mp.events.call("server:changeMoney", player, "paycheck", "-", amount)
