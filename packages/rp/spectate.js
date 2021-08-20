@@ -54,7 +54,7 @@ mp.events.add('server:unspec', (player) => {
         player.call('client:clearSpectate')
         clearInterval(player.specTimer)
         player.specTimer = undefined
-        if (player.specTarget) {
+        if (player.specTarget != undefined && player.specTarget != null) {
             let getId = findPlayer(player.specTarget)
             player.specTarget = undefined
             if (getId) {

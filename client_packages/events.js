@@ -16,6 +16,7 @@ var showCash = false
 var showBank = false
 var res_X = 1920;
 var res_Y = 1080;
+var trySpec = false
 
 function numberWithCommas(x) {
     var parts = x.toString().split(".");
@@ -85,6 +86,7 @@ mp.events.add('client:spectate', (target) => {
 })
 
 mp.events.add('client:clearSpectate', () => {
+    trySpec = false
     spectate = false
     spectating = null
 })
@@ -92,12 +94,19 @@ mp.events.add('client:clearSpectate', () => {
 mp.events.add('render', () => {
     if (spectate && spectating != null && spectating.handle !== 0) {
         mp.game.invoke("0x8BBACBF51DA047A8", spectating.handle)
+        trySpec = false
     }
     else if (spectate) {
-        spectate = false
-        spectating = null
         mp.gui.chat.push(`${sP} The spectated player is no longer valid.`)
-        mp.events.callRemote('server:unspec')
+        if (!trySpec) {
+            setTimeout(() => { trySpec = true })
+        }
+        else {
+            trySpec = false
+            spectate = false
+            spectating = null
+            mp.events.callRemote('server:unspec')
+        }
     }
     if (showCash == true) {
         mp.game.graphics.drawText(moneystring, [(res_X - 80) / res_X, 0.060], {
