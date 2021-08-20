@@ -30,7 +30,8 @@ mp.events.add("server:loadMoney", async (player, show = false, callback = false)
 mp.events.add("server:changeMoney", async (player, type, action, amount, reason) => { // TODO: Logging reason
     try {
         if (player && player.charId && type && action && amount != undefined && amount != null) {
-            let query = (`UPDATE \`characters\` SET \`${type}\` = ${type} ${action} ${amount} WHERE charId = ?`)
+            let query = (`UPDATE \`characters\` SET \`${type}\` = ${type} ${action} ${amount} WHERE charId = ?`) // TODO: this is actually a TERRIBLE idea, rewrite with switch case instead.
+            // example of why you shouldn't do this: if player injects clientside and then calls mp.events.call('server:changeMoney', player, "admin", "+", "10"), now he changed admin row!
             const [status] = await mp.db.query(query, [player.charId]);
             mp.events.call("server:loadMoney", player)
         }
@@ -54,9 +55,6 @@ mp.events.add("server:oChangeMoney", async (charId, type, action, amount, string
     catch (e) { errorHandler(e) }
 })
 
-mp.events.addCommand("add", (player) => {
-    mp.events.call("server:changeMoney", player, "cash", "+", "5")
-})
 
 function money(player) {
     player.outputChatBox(`!{#FFFFFF}Cash: ${cMoney}$${player.cash}!{#FFFFFF} Bank: ${cMoney}$${player.bank}!{#FFFFFF} Paycheck: ${cMoney}$${player.paycheck}`)
@@ -139,8 +137,8 @@ mp.events.addCommand("transfer", async (player, fullText, first, last, amount, .
                 if (row.length > 0) {
                     recipient = row[0].charId
                     mp.events.call("server:changeMoney", player, "bank", "-", amount)
-                    player.outputChatBox(`${cMoney} You sent $${amount} to ${row[0].first} ${row[0].last}.`)
-                    mp.events.call("server:oChangeMoney", recipient, "bank", "+", amount, `${cMoney} You received $${amount} from ${player.cName}.`)
+                    player.outputChatBox(`${cMoney} You sent $${amount} to ${row[0].first} ${row[0].last} via bank transfer.`)
+                    mp.events.call("server:oChangeMoney", recipient, "bank", "+", amount, `${cMoney} You received $${amount} from ${player.cName} via bank transfer.`)
                     if (reason == undefined) { reason = null }
                     if (reason != undefined && reason != null) { reason = reason.join(' '); }
                     const [transfer] = await mp.db.query('INSERT INTO `transfers` SET `sender` = ?, `receiver` = ?, `amount` = ?, `reason` = ?', [player.charId, recipient, amount, reason])
@@ -197,18 +195,42 @@ async function payFunc(player) {
     }
     else {
         player.payTime = 0
+        previous = player.paycheck
+        paycheck = "ERROR"
         const [updater2] = await mp.db.query('UPDATE `characters` SET `payTime` = ?, `paycheckAmt` = paycheckAmt + 1 WHERE `charId` = ?', [0, player.charId])
         if (player.paycheckAmt > 50) { // pay them less
-            mp.events.call("server:changeMoney", player, "bank", "+", 500)
+            mp.events.call("server:changeMoney", player, "paycheck", "+", 500)
+            paycheck = "500"
         }
         else { // pay them more
-            mp.events.call("server:changeMoney", player, "bank", "+", 2000)
+            mp.events.call("server:changeMoney", player, "paycheck", "+", 2000)
+            paycheck = "2000"
         }
+        setTimeout(() => {
+            player.outputChatBox("========= PAYDAY =========") // TODO: Better string
+            player.outputChatBox(`Old balance: $${previous}`)
+            player.outputChatBox(`Paycheck: $${paycheck}`)
+            player.outputChatBox(`New balance: $${player.paycheck}`)
+        }, 1000)
     }
 }
 
 mp.events.add('playerQuit', async (player) => {
     if (player.charId != undefined && player.charId != null && player.payTime != undefined && player.payTime != null) {
         const [updater] = await mp.db.query('UPDATE `characters` SET `payTime` = ? WHERE `charId` = ?', [player.payTime, player.charId])
+    }
+})
+
+mp.events.addCommand("payday", async (player) => {
+    let amount = player.paycheck
+    mp.events.call("server:changeMoney", player, "paycheck", "-", amount)
+    mp.events.call("server:changeMoney", player, "bank", "+", amount)
+    player.outputChatBox(`${cMoney}$${amount} has been transferred to your bank account.`)
+})
+
+mp.events.addCommand("force", (player) => {
+    if (player.admin > 9) {
+        player.payTime = 60
+        payFunc(player)
     }
 })

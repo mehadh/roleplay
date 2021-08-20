@@ -4,7 +4,7 @@ function specPos(player, getId) {
     player.position = pos
 }
 
-mp.events.add('spec', (player, id) => {
+mp.events.add('server:spec', (player, id) => {
     if (player.admin > 1) {
         if (player.specTarget) {
             let getId = findPlayer(player.specTarget)
