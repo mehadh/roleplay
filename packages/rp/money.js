@@ -208,9 +208,9 @@ async function payFunc(player) {
         }
         setTimeout(() => {
             player.outputChatBox("========= PAYDAY =========") // TODO: Better string
-            player.outputChatBox(`Old balance: $${previous}`)
-            player.outputChatBox(`Paycheck: $${paycheck}`)
-            player.outputChatBox(`New balance: $${player.paycheck}`)
+            player.outputChatBox(`Old balance: ${cMoney}$${previous}`)
+            player.outputChatBox(`Paycheck: ${cMoney}$${paycheck}`)
+            player.outputChatBox(`New balance: ${cMoney}$${player.paycheck}`)
         }, 1000)
     }
 }
@@ -222,10 +222,16 @@ mp.events.add('playerQuit', async (player) => {
 })
 
 mp.events.addCommand("payday", async (player) => {
-    let amount = player.paycheck
-    mp.events.call("server:changeMoney", player, "paycheck", "-", amount)
-    mp.events.call("server:changeMoney", player, "bank", "+", amount)
-    player.outputChatBox(`${cMoney}$${amount} has been transferred to your bank account.`)
+    if (checkBank()) {
+        let amount = player.paycheck
+        if (amount > 0) {
+            mp.events.call("server:changeMoney", player, "paycheck", "-", amount)
+            mp.events.call("server:changeMoney", player, "bank", "+", amount)
+            player.outputChatBox(`${cMoney}$${amount} has been transferred to your bank account.`)
+        }
+        else { player.outputChatBox(`${eP} You don't have any money to transfer!`) }
+    }
+    else { player.outputChatBox(sFar) }
 })
 
 mp.events.addCommand("force", (player) => {
