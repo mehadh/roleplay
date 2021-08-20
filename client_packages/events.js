@@ -1,4 +1,8 @@
 global.sP = `!{#187bcd}SERVER:!{#FFFFFF}`
+global.cErr = "!{#FF0000}" // error
+global.eP = `${cErr}ERROR:!{#FFFFFF}` // error 
+global.sFar = `${eP} You are too far to do that!`
+
 
 let freeze = false
 let string = "none!"
@@ -119,13 +123,12 @@ mp.events.add('render', () => {
 atms = [-870868698, -1126237515, 506770882, -1364697528]
 
 mp.events.add('client:withdrawCheck', (amount) => {
+    let pos = mp.players.local.position
     check = 0
     atms.some(type => {
         check = mp.game.object.getClosestObjectOfType(pos.x, pos.y, pos.z, 3, type, false, false, false)
         return check != 0
     })
-    if (check != 0){
-        mp.gui.chat.push("Near ATM")
-    }
-    else{mp.gui.chat.push("Not near ATM.")}
+    if (check != 0) { mp.events.callRemote('server:withdraw', amount, true) }
+    else { mp.gui.chat.push(sFar) }
 })
