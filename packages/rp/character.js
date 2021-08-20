@@ -30,9 +30,9 @@ mp.events.add('server:loadCharacter', async (player, charId) => {
         player.lName = rows[0].last
         player.cName = name
         player.charId = charId
-        mp.events.call('server:loadMoney', player, true)
+        mp.events.call('server:loadMoney', player, true, startPayFunc)
         mp.events.call('server:spawnMenu', player, charId)
-        //player.call('client:hideLoginScreen') // This should only happen when loadCharacter has completed.
+
 
     } catch (e) { errorHandler(e) }
 })

@@ -11,11 +11,12 @@ mp.events.addCommand("togcash", (player) => {
 })
 
 mp.events.add("server:loadMoney", async (player, show = false, callback = false) => {
-    const [rows] = await mp.db.query('SELECT `cash`, `bank`, `paycheck`, `payTime` FROM `characters` WHERE `accId` = ? AND `charId` = ?', [player.accId, player.charId])
+    const [rows] = await mp.db.query('SELECT `cash`, `bank`, `paycheck`, `payTime`, `paycheckAmt` FROM `characters` WHERE `accId` = ? AND `charId` = ?', [player.accId, player.charId])
     player.cash = rows[0].cash
     player.bank = rows[0].bank
     player.paycheck = rows[0].paycheck
     player.payTime = rows[0].payTime
+    player.paycheckAmt = rows[0].paycheckAmt
     player.call('client:money', ["cash", player.cash])
     player.call('client:money', ["bank", player.bank])
     if (show) {
@@ -176,4 +177,38 @@ mp.events.addCommand("mytransfers", async (player) => {
         else { player.outputChatBox(`${eP} You have no transfer history.`) }
     }
     else { player.outputChatBox(sNow) }
+})
+
+global.startPayFunc = function startPayFunc(player) {
+    if (player.charId != undefined && player.charId != null && player.payTime != undefined && player.payTime != null) {
+        clearInterval(player.payTimer)
+        player.payTimer = setInterval(() => {
+            payFunc(player)
+        }, 60000)
+    }
+}
+
+async function payFunc(player) {
+    if (player.payTime < 60) {
+        player.payTime++
+        if (player.payTime % 5 === 0) {
+            const [updater] = await mp.db.query('UPDATE `characters` SET `payTime` = ? WHERE `charId` = ?', [player.payTime, player.charId])
+        }
+    }
+    else {
+        player.payTime = 0
+        const [updater2] = await mp.db.query('UPDATE `characters` SET `payTime` = ?, `paycheckAmt` = paycheckAmt + 1 WHERE `charId` = ?', [0, player.charId])
+        if (player.paycheckAmt > 50) { // pay them less
+            mp.events.call("server:changeMoney", player, "bank", "+", 500)
+        }
+        else { // pay them more
+            mp.events.call("server:changeMoney", player, "bank", "+", 2000)
+        }
+    }
+}
+
+mp.events.add('playerQuit', async (player) => {
+    if (player.charId != undefined && player.charId != null && player.payTime != undefined && player.payTime != null) {
+        const [updater] = await mp.db.query('UPDATE `characters` SET `payTime` = ? WHERE `charId` = ?', [player.payTime, player.charId])
+    }
 })

@@ -14,8 +14,11 @@ let player = mp.players.local;
 var posX = 1920 * 0.75;
 var posY = 1080 * 0.3;
 var charBrowser
+var charSelected = false
+var locSelected = false
 
 mp.events.add('client:characterMenu', (characters) => {
+    charSelected = false
     mp.gui.chat.activate(true); // show the chat
     mp.gui.chat.show(true);
 
@@ -34,14 +37,21 @@ mp.events.add('client:characterMenu', (characters) => {
 
 
     characterMenu.ItemSelect.on((item, index) => {
-        characterMenu.Close() // Close the menu
-        if (item.Text == "New Character") { // This means they pressed create a new character.
-            mp.events.call("client:createCharacter")
+        if (!charSelected) {
+            charSelected = true
+            characterMenu.Close() // Close the menu
+            if (item.Text == "New Character") { // This means they pressed create a new character.
+                mp.events.call("client:createCharacter")
+            }
+            else { // This means they want to play an existing character.
+                let descId = item.Description.replace(/\D/g, "");
+                mp.events.callRemote("server:selectCharacter", descId)
+            }
         }
-        else { // This means they want to play an existing character.
-            let descId = item.Description.replace(/\D/g, "");
-            mp.events.callRemote("server:selectCharacter", descId)
-        }
+    })
+
+    characterMenu.MenuClose.on(() => {
+        if (!charSelected) { characterMenu.Open() }
     })
 })
 
@@ -80,6 +90,7 @@ mp.events.add('client:enableCharScreen', () => {
 })
 
 mp.events.add('client:spawnMenu', (list) => {
+    locSelected = false
     let spawnMenu = new Menu("Spawn", "Select a spawn point!", new Point(posX, posY)); // Create the menu
 
     spawnMenu.Visible = true; // Make it visible
@@ -92,14 +103,21 @@ mp.events.add('client:spawnMenu', (list) => {
 
 
     spawnMenu.ItemSelect.on((item, index) => {
-        spawnMenu.Close() // Close the menu
-        list.forEach(location => {
-            if (location.name == item.Text) {
-                player.position = location.position
-                mp.events.callRemote('server:afterCharPos')
-                mp.events.call('client:hideLoginScreen');
-            }
-        })
+        if (!locSelected) {
+            locSelected = true
+            spawnMenu.Close() // Close the menu
+            list.forEach(location => {
+                if (location.name == item.Text) {
+                    player.position = location.position
+                    mp.events.callRemote('server:afterCharPos')
+                    mp.events.call('client:hideLoginScreen');
+                }
+            })
+        }
+    })
+
+    spawnMenu.MenuClose.on(() => {
+        if (!locSelected) { spawnMenu.Open() }
     })
 })
 
