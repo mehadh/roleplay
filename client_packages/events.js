@@ -98,7 +98,7 @@ mp.events.add('render', () => {
     }
     else if (spectate) {
         if (!trySpec) {
-            setTimeout(() => { trySpec = true }, 2000)
+            setTimeout(() => { trySpec = true }, 5000)
         }
         else {
             mp.gui.chat.push(`${sP} The spectated player is no longer valid.`)
