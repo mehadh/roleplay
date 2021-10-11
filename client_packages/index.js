@@ -16,3 +16,4 @@ mp.events.add('render', () => {
 
 require('./events.js');
 require('./cam.js');
+require('./vehicles.js');

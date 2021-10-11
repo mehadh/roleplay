@@ -10,3 +10,5 @@ require('./character.js');
 require('./admin.js');
 require('./spectate.js');
 require('./money.js')
+require('./phone.js')
+require('./vehicles.js')
