@@ -5,11 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "mysql": "^2.18.1",
     "mysql2": "^2.1.0"
   },
   "devDependencies": {
-    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#master",
-    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#master"
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#v1.0",
+    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#v1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
