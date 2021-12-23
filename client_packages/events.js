@@ -17,6 +17,7 @@ var showBank = false
 var res_X = 1920;
 var res_Y = 1080;
 var trySpec = false
+var showSpeedo = true
 
 function numberWithCommas(x) {
     var parts = x.toString().split(".");
@@ -91,6 +92,77 @@ mp.events.add('client:clearSpectate', () => {
     spectating = null
 })
 
+function getMinimapAnchor() 
+{
+    let sfX = 1.0 / 20.0;
+    let sfY = 1.0 / 20.0;
+    let safeZone = mp.game.graphics.getSafeZoneSize();
+    let aspectRatio = mp.game.graphics.getScreenAspectRatio(false);
+    let resolution = mp.game.graphics.getScreenActiveResolution(0, 0);
+    let scaleX = 1.0 / resolution.x;
+    let scaleY = 1.0 / resolution.y;
+
+    let minimap = {
+        width: scaleX * (resolution.x / (4 * aspectRatio)),
+        height: scaleY * (resolution.y / 5.674),
+        scaleX: scaleX,
+        scaleY: scaleY,
+        leftX: scaleX * (resolution.x * (sfX * (Math.abs(safeZone - 1.0) * 10))),
+        bottomY: 1.0 - scaleY * (resolution.y * (sfY * (Math.abs(safeZone - 1.0) * 10))),
+    };
+
+    minimap.rightX = minimap.leftX + minimap.width;
+    minimap.topY = minimap.bottomY - minimap.height;
+
+    return minimap;
+}
+
+
+function drawText(text, drawXY, font, color, scale) 
+{
+	mp.game.ui.setTextEntry("STRING");
+	mp.game.ui.addTextComponentSubstringPlayerName(text);
+	mp.game.ui.setTextFont(font);
+	mp.game.ui.setTextScale(scale, scale);
+	mp.game.ui.setTextColour(color[0], color[1], color[2], color[3]);
+	mp.game.invoke("0x2513DFB0FB8400FE"); // SET_TEXT_OUTLINE
+	mp.game.ui.setTextRightJustify(true);
+	mp.game.ui.setTextWrap(0, drawXY[0]);
+	mp.game.ui.drawText(drawXY[0], drawXY[1]);
+}
+
+setInterval(() => {
+
+	// radar visible and not hidden
+	if(mp.game.invoke("0xAF754F20EB5CD51A") && !mp.game.invoke("0x157F93B036700462"))
+	{
+		if(localPlayer.vehicle)
+		{
+			if(localPlayer.vehicle.getPedInSeat(-1) == localPlayer.handle)
+			{
+				if(localPlayer.vehicle.model != mp.game.joaat("submersible") && localPlayer.vehicle.model != mp.game.joaat("submersible2"))
+				{
+					if(showSpeedo == false)
+					{
+						isMetric = mp.game.gameplay.getProfileSetting(227) == 1;
+						minimap = getMinimapAnchor();
+
+						showSpeedo = true;
+					}
+
+					return true;
+				}
+			}
+		}
+	}
+	
+	if(showSpeedo == true)
+	{
+		showSpeedo = false;
+	}
+
+}, 200);
+
 mp.events.add('render', () => {
     if (spectate && spectating != null && spectating.handle !== 0) {
         mp.game.invoke("0x8BBACBF51DA047A8", spectating.handle)
@@ -126,6 +198,29 @@ mp.events.add('render', () => {
             outline: true,
             centre: true
         });
+    }
+
+    const vehicle = localPlayer.vehicle;
+    if (vehicle){
+        if(showSpeedo == true) 
+		{
+			drawText(
+				`${(vehicle.getSpeed() * (isMetric ? 3.6 : 2.236936)).toFixed(0)} ${(isMetric) ? "km/h" : "mph"}`, 
+				[minimap.rightX + 0.010, minimap.bottomY - 0.0485], 4, [176, 176, 176, 255], 0.45
+            );                                                              // rightX - 0.003
+            if (vehicle.getVariable("mileage") != undefined){
+                drawText(`${vehicle.getVariable("mileage")} miles`, [minimap.rightX + 0.010, minimap.bottomY - 0.185], 4, [176, 176, 176, 255], 0.45)
+            }
+            else{
+                drawText(`0 miles`, [minimap.rightX + 0.010, minimap.bottomY - 0.185], 4, [176, 176, 176, 255], 0.45)
+            }
+            if (vehicle.getVariable("fuel") != undefined && vehicle.getVariable("fuel") != "exempt"){
+                drawText(`${vehicle.getVariable("fuel")}%`, [minimap.leftX + 0.032, minimap.bottomY - 0.185], 4, [176, 176, 176, 255], 0.45)
+            }
+            else{
+                drawText(`100%`, [minimap.leftX + 0.032, minimap.bottomY - 0.185], 4, [176, 176, 176, 255], 0.45)
+            }
+		}
     }
 })
 

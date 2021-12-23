@@ -26,3 +26,7 @@ mp.events.add('entityStreamIn', (entity) => {
 mp.keys.bind(0x59, true, function () {
     mp.events.callRemote('server:engine');
 });
+
+mp.keys.bind(0x4C, true, function() {
+    mp.events.callRemote('server:lock');
+});

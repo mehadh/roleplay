@@ -747,6 +747,7 @@ mp.events.addCommand('veh', (player, fullText, arg1, arg2, arg3, arg4) => {
                     adminVeh.destroy();
                 }
             }, 300000)
+            adminVeh.owner = player.charId
         }
         else { player.outputChatBox(`${uP} /veh [model] [color] [color] [color]`) }
 

@@ -12,3 +12,4 @@ require('./spectate.js');
 require('./money.js')
 require('./phone.js')
 require('./vehicles.js')
+require('./mask.js')
