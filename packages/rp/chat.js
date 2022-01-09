@@ -226,3 +226,31 @@ mp.events.addCommand("w", (player, fullText, id, ...message) => {
     }
     else { player.outputChatBox(`${uP} /w [id] [message]`) }
 })
+
+mp.events.addCommand('cw', (player, message) => {
+    if (player.vehicle != null && player.vehicle != undefined){
+            if (message != null && message != undefined){
+            let occupants = player.vehicle.getOccupants();
+            occupants.forEach(occupant => {
+                occupant.outputChatBox(`${cWhi} ${player.name} whispers: ${message}`)
+            })
+        }
+        else{player.outputChatBox(`${uP} /cw [message]`)}
+    }
+    else{player.outputChatBox(`${eP} You are not in a car!`)}
+})
+
+mp.events.addCommand('cb', (player, message) => {
+    if (player.vehicle != null && player.vehicle != undefined){
+            if (message != null && message != undefined){
+            pNamer(player, cWhi)
+            let occupants = player.vehicle.getOccupants();
+            occupants.forEach(occupant => {
+                occupant.outputChatBox(`${cWhi}(( ${pName} (${player.id}): ${message} ))`)
+            })
+        }
+        else{player.outputChatBox(`${uP} /cb [message]`)}
+    }
+    else{player.outputChatBox(`${eP} You are not in a car!`)}
+})
+

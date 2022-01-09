@@ -1,4 +1,7 @@
-test car selling
-is lock on v spawn broken? 
-
+added car selling
+added idle car selling
 added /vp to park veh; added despawnVeh event
+added mod parsing in vspawn
+added /mod to use mod menu, someone remind me to remove this later please
+fixed bugs in mod menu, still need to add plate types, test further to see if its all working nicely
+added /cb and /cw

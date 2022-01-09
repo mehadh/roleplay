@@ -98,6 +98,12 @@ mp.events.add('server:spawnVeh', async (player, vehId) => {
             veh.setVariable("mileage", vRows[0].mileage)
             veh.numberPlate = vRows[0].numberPlate
             // Mods go here
+            // veh.mods = what is this here????
+            veh.modObj = JSON.parse(vRows[0].mods) 
+            for (var type in veh.modObj){
+                veh.setMod(parseInt(type), parseInt(veh.modObj[type]))
+            }
+            if (veh.modObj == null || veh.modObj == undefined){veh.modObj = {}}
         }
         else{player.outputChatBox(`${eP} There was an error while spawning your vehicle.`)}
     }
@@ -271,3 +277,91 @@ mp.events.addCommand('vbuy', (player, fullText, vehId, option="cash") => {
     }
 })
 
+mp.events.addCommand('mod', player => {
+    player.call('client:modMenu')
+})
+
+var modprices = [{name: "spoilers", price: 500}, {name: "front bumper", price: 1000}] 
+
+mp.events.add('server:buyMod', async (player, name, index, choice=-1, method="Cash") => {
+    //player.outputChatBox(`We got ${name} and ${index} and ${choice} and ${method}`)
+    // Most of this event is code from an older project. It could be done better, but it's functional. 
+    let namecheck = name.toLowerCase()
+    let modprice = 250
+    if (choice == undefined || choice == null){choice = -1}
+    if (method == undefined || method == null){method = "Cash"}
+    if (namecheck != "engine" && namecheck != "transmission" && namecheck != "brakes" && namecheck != "suspension"){ // Static price if it's not engine/trans/brakes/susp
+        modprices.forEach(obj => {
+            if (obj.name.toLowerCase() == namecheck){
+                modprice = obj.price
+            }
+        })
+    }
+    else{
+        switch(namecheck){ // Right now this is like this, in future engine, trans, brakes, susp should all have diff prices, but also according to diff level
+            case "engine": // if it's gonna be static difference we can +- from base price, let's consider changing this later 
+                if (parseInt(choice) == -1){modprice = 200}
+                if (parseInt(choice) == 0){modprice = 400}
+                if (parseInt(choice) == 1){modprice = 600}
+                if (parseInt(choice) == 2){modprice = 800}
+                if (parseInt(choice) == 3){modprice = 1000}
+                break;
+            case "transmission":
+                if (parseInt(choice) == -1){modprice = 200}
+                if (parseInt(choice) == 0){modprice = 400}
+                if (parseInt(choice) == 1){modprice = 600}
+                if (parseInt(choice) == 2){modprice = 800}
+                if (parseInt(choice) == 3){modprice = 1000}
+                break;
+            case "brakes":
+                if (parseInt(choice) == -1){modprice = 200}
+                if (parseInt(choice) == 0){modprice = 400}
+                if (parseInt(choice) == 1){modprice = 600}
+                if (parseInt(choice) == 2){modprice = 800}
+                if (parseInt(choice) == 3){modprice = 1000}
+                break;
+            case "suspension":
+                if (parseInt(choice) == -1){modprice = 200}
+                if (parseInt(choice) == 0){modprice = 400}
+                if (parseInt(choice) == 1){modprice = 600}
+                if (parseInt(choice) == 2){modprice = 800}
+                if (parseInt(choice) == 3){modprice = 1000}
+                break;
+        }
+    } // TODO: might need change owner?
+    if (player.vehicle != undefined && player.vehicle != null && player.vehicle.owner == player.charId && !isNaN(player.vehicle.vehId)){
+        if (method.toLowerCase() == "cash"){
+            if (player.cash >= modprice){
+                mp.events.call("server:changeMoney", player, "cash", "-", modprice, `Bought mods for veh ${player.vehicle.vehId}`)
+                player.vehicle.setMod(parseInt(index), choice) // add the mod
+                // access mod json
+                if (player.vehicle.modObj.hasOwnProperty(index)){ // if it's already there get rid of it
+                    delete player.vehicle.modObj.index
+                }
+                player.vehicle.modObj[index] = choice // then add it
+                const [car] = await mp.db.query('UPDATE `vehicles` SET `mods` = ?', [JSON.stringify(player.vehicle.modObj)])
+                // if ([car].affectedRows === 1) player.outputChatBox(`${name} purchased for $${modprice}. Enjoy!`);
+                // else{player.outputChatBox(`${eP} Oopsies! Please report this error to an admin. You purchased a ${name} for $${modprice} but did not receive it.`)} 
+                player.outputChatBox(`${name} purchased for $${modprice}. Enjoy!`);
+            }
+            else{player.outputChatBox(`${sAfford}`)}
+        }
+        if (method.toLowerCase() == "bank"){
+            if (player.bank >= modprice){
+                mp.events.call("server:changeMoney", player, "bank", "-", modprice, `Bought mods for veh ${player.vehicle.vehId}`)
+                player.vehicle.setMod(parseInt(index), choice) // add the mod
+                // access mod json
+                if (player.vehicle.modObj.hasOwnProperty(index)){ // if it's already there get rid of it
+                    delete player.vehicle.modObj.index
+                }
+                player.vehicle.modObj[index] = choice // then add it
+                const [car] = await mp.db.query('UPDATE `vehicles` SET `mods` = ?', [JSON.stringify(player.vehicle.modObj)])
+                // if ([car].affectedRows === 1) player.outputChatBox(`${name} purchased for $${modprice}. Enjoy!`);
+                // else{player.outputChatBox(`${eP} Oopsies! Please report this error to an admin. You purchased a ${name} for $${modprice} but did not receive it.`)} 
+                player.outputChatBox(`${name} purchased for $${modprice}. Enjoy!`);
+            }
+            else{player.outputChatBox(`${sAfford}`)}
+        }
+    }
+    else{player.outputChatBox(sPerm)}
+})

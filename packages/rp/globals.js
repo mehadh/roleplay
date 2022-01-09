@@ -143,7 +143,7 @@ global.sNotFound = `${eP} There was no player found!`
 global.sPerm = `${eP} You do not have permission to do that!`
 global.sNow = `${eP} You can not do that right now!`
 global.sFar = `${eP} You are too far to do that!`
-
+global.sAfford = `${eP} You can not afford that!`
 // Settings
 global.oChat = false // OOC chat toggle
 
