@@ -3,6 +3,8 @@ async function initializeDatabase(){
         const conn = await mp.db.getConnection();
         if(conn){
             console.log('Database Connected successfully.');
+            // Go to business.js to load in businesses
+            mp.events.call('server:initBiz')
             conn.release();
             return;
         }

@@ -254,3 +254,36 @@ mp.events.addCommand('cb', (player, message) => {
     else{player.outputChatBox(`${eP} You are not in a car!`)}
 })
 
+mp.events.addCommand("ame", (player, message) => {
+    if (message) {
+        //pNamer(player, cRp)
+        pName = player.name
+        if (pName != null) {
+            clearTimeout(player.ameTimer)
+            player.setVariable('ame', `* ${pName} ${message}`)
+            player.outputChatBox(`${cRp}> ${pName} ${message}`)
+            player.ameTimer = setTimeout(function(){
+                player.setVariable('ame', null)
+            }, 3000)
+        }
+        else { player.outputChatBox(sNow) }
+    }
+    else { player.outputChatBox(`${uP} /ame [action]`) }
+})
+
+mp.events.addCommand("amy", (player, message) => {
+    if (message) {
+        //pNamer(player, cRp)
+        pName = player.name
+        if (pName != null) {
+            clearTimeout(player.ameTimer)
+            player.setVariable('amy', `* ${pName}'s ${message}`)
+            player.outputChatBox(`${cRp}> ${pName}'s ${message}`)
+            player.ameTimer = setTimeout(function(){
+                player.setVariable('ame', null)
+            }, 3000)
+        }
+        else { player.outputChatBox(sNow) }
+    }
+    else { player.outputChatBox(`${uP} /ame [action]`) }
+})

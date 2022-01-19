@@ -328,7 +328,7 @@ mp.events.add('server:buyMod', async (player, name, index, choice=-1, method="Ca
                 if (parseInt(choice) == 3){modprice = 1000}
                 break;
         }
-    } // TODO: might need change owner?
+    } // 
     if (player.vehicle != undefined && player.vehicle != null && player.vehicle.owner == player.charId && !isNaN(player.vehicle.vehId)){
         if (method.toLowerCase() == "cash"){
             if (player.cash >= modprice){

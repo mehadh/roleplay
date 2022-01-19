@@ -164,6 +164,48 @@ setInterval(() => {
 }, 200);
 
 mp.events.add('render', () => {
+    mp.vehicles.forEach((thecar) => {
+        let player = mp.players.local
+        let pos = player.position
+        let pos2 = thecar.position
+        var distance = mp.game.gameplay.getDistanceBetweenCoords(pos.x, pos.y, pos.z, pos2.x, pos2.y, pos2.z, false)
+        if (distance < 5){
+            let variable = thecar.getVariable('vstring')
+            if (variable != null){
+                let position = thecar.position
+                mp.game.graphics.drawText(`${variable}`, [position.x, position.y, position.z], { 
+                    font: 4, 
+                    color: [255, 255, 255, 185], 
+                    scale: [0.4, 0.4], 
+                    outline: true,
+                    centre: true
+                  });
+            }
+        }
+    })
+
+    mp.players.forEach((guy) => {
+        let player = mp.players.local
+        let pos = player.position
+        let pos2 = guy.position
+        var distance = mp.game.gameplay.getDistanceBetweenCoords(pos.x, pos.y, pos.z, pos2.x, pos2.y, pos2.z, false)
+        if (distance < 5){
+            let variable = guy.getVariable('ame')
+            if (variable != null && player != guy){
+                //let position = guy.position   // 31086  was 0.5  12844
+                let position = guy.getBoneCoords(31086, 0.8, 0, 0)
+                mp.game.graphics.drawText(`${variable}`, [position.x, position.y, position.z], { 
+                    font: 4, 
+                    color: [194, 162, 218, 255], 
+                    scale: [0.4, 0.4], 
+                    outline: true,
+                    centre: true
+                  });
+            }
+        }
+
+    }) 
+
     if (spectate && spectating != null && spectating.handle !== 0) {
         mp.game.invoke("0x8BBACBF51DA047A8", spectating.handle)
         trySpec = false
